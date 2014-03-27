@@ -19,9 +19,13 @@ console.log("\nFetching the recipe from the DIY Soylent website...");
 
     // Override macros based on user variables from top of this file
     nutrientTargets.calories = calories;
+
+        // convert from calories to grams
     nutrientTargets.carbs    = Math.round(macros.carbs * calories / 100 / 4);
     nutrientTargets.protein  = Math.round(macros.protein * calories / 100 / 4);
     nutrientTargets.fat      = Math.round(macros.fat * calories / 100 / 9);
+
+      // max for macros and calories is 104% of target
     nutrientTargets.calories_max = Number((nutrientTargets.calories * 1.04).toFixed(2));
     nutrientTargets.carbs_max    = Number((nutrientTargets.carbs * 1.04).toFixed(2));
     nutrientTargets.protein_max  = Number((nutrientTargets.protein * 1.04).toFixed(2));
