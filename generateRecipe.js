@@ -6,18 +6,7 @@
  *
  */
 
-// This can be replaced with any of the recipes on http://diy.soylent.me
-var recipeUrl = "http://diy.soylent.me/recipes/people-chow-301-tortilla-perfection";
-
-// Calorie goal
-var calories = 2200;
-
-// Ratio of carbs / protein / fat. Should add to 100
-var macros = {
-    carbs: 40,
-    protein: 30,
-    fat: 30
-};
+var nutrients = require('./nutrients')
 
 var ingredientLength,
     targetLength, // Length of ingredient and target array (also dimensions of m)
@@ -27,16 +16,6 @@ var ingredientLength,
     maxPerMin,    // Ratio of maximum value to taget value for each ingredient
     lowWeight,
     highWeight;   // How to weight penalties for going over or under a requirement
-
-var nutrients = [
-    'calories', 'carbs', 'protein', 'fat', 'biotin', 'calcium', 'chloride', 'cholesterol', 'choline', 'chromium', 'copper',
-    'fiber', 'folate', 'iodine', 'iron', 'maganese', 'magnesium', 'molybdenum', 'niacin', 'omega_3', 'omega_6',
-    'panthothenic', 'phosphorus', 'potassium', 'riboflavin', 'selinium', 'sodium', 'sulfur', 'thiamin',
-    'vitamin_a', 'vitamin_b12', 'vitamin_b6', 'vitamin_c', 'vitamin_d', 'vitamin_e', 'vitamin_k', 'zinc'
-];
-
-// These nutrients are considered 'more important'
-var macroNutrients = ["calories", "protein", "carbs", "fat"];
 
 /**
  * Fitness function that is being optimized
@@ -51,7 +30,7 @@ var macroNutrients = ["calories", "protein", "carbs", "fat"];
  */
 function f(x) {
 
-    var output = createArray(targetLength),
+    var output = new Array(targetLength),
         totalError = 0;
 
     // M*x - 1
@@ -89,7 +68,7 @@ function f(x) {
  */
 function gradient(x){
 
-    var output = createArray(targetLength);
+    var output = new Array(targetLength);
 
     // output = M*x
     for (var t = 0; t < targetLength; t++) {
@@ -138,7 +117,7 @@ function generateRecipe(ingredients, nutrientTargets) {
             nutrient = name.replace(/_max$/, '')
         value = nutrientTargets[key];
 
-        if (nutrients.indexOf(nutrient) > -1 && name.substring(name.length - 4, name.length) != "_max" && value > 0) {
+        if (nutrients.micro.indexOf(nutrient) > -1 && name.substring(name.length - 4, name.length) != "_max" && value > 0) {
             targetName.push(name);
             targetAmount.push(value);
         }
@@ -161,7 +140,7 @@ function generateRecipe(ingredients, nutrientTargets) {
         }
 
         // Weight macro nutrients values higher and make sure we penalize for going over (ad hoc common sense rule)
-        if (macroNutrients.indexOf(targetName[t]) >= 0) {
+        if (nutrients.macro.indexOf(targetName[t]) >= 0) {
             lowWeight[t] = 5;
             highWeight[t] = 5;
             maxPerMin[t] = 1;
@@ -184,7 +163,7 @@ function generateRecipe(ingredients, nutrientTargets) {
 
     ingredientLength = ingredients.length;
     targetLength = targetAmount.length;
-    M = createArray(ingredientLength, targetLength);
+    M = make2dArray(ingredientLength, targetLength);
     cost = [];
 
     for (var i = 0; i < ingredients.length; i++) {
@@ -262,17 +241,11 @@ function generateRecipe(ingredients, nutrientTargets) {
     return ingredientQuantities;
 }
 
-// Convenience function for preinitializing arrays because I'm not accustomed to working on javascript
-function createArray(length) {
-    var arr = new Array(length || 0),
-        i = length;
-
-    if (arguments.length > 1) {
-        var args = Array.prototype.slice.call(arguments, 1);
-        while(i--) arr[length-1 - i] = createArray.apply(this, args);
-    }
-
-    return arr;
+function make2dArray(a,b) {
+    var spine = new Array(a);
+    // did you know that Array.map skips uninitialized entries?
+    for(var i = 0; i < a; i++) { spine[i] = new Array(b)};
+    return spine;
 }
 
 module.exports = generateRecipe;

@@ -1,7 +1,9 @@
 var Table = require('cli-table');    // Library to output the results in a pretty way
 var colors = require('colors');
 
-module.exports = function(ingredients,ingredientQuantities,nutrients,nutrientTargets) {
+var nutrients = require('./nutrients').micro;
+
+module.exports = function(ingredients,ingredientQuantities,nutrientTargets) {
 
 
 // Now lets output the results. First the ingredients.
