@@ -3,6 +3,7 @@
 
 var recipeUrls = ["http://diy.soylent.me/recipes/people-chow-301-tortilla-perfection"
     ,"http://diy.soylent.me/recipes/alternate-fats"
+ //   ,"http://diy.soylent.me/recipes/oats-whey-n-maltodextrin"
 // ,"http://diy.soylent.me/recipes/copy-of-teds-1000-cal-paleo-chow-for-fat-loss-muscle-gain-4"
 
 ];
@@ -18,25 +19,14 @@ var macros = {
     fat: 35
 };
 
-
-// Fetch recipe, pass to generateRecipe function and output results...
-
-
+var generateRecipe = require('./generateRecipe');
+var fetcher = require('./fetcher');
+var output = require ('./output');
 
 var run = function(ingredients,nutrientTargets) {
-    var generateRecipe = require('./generateRecipe');
-
     var ingredientQuantities = generateRecipe(ingredients, nutrientTargets);
-
-
-    var output = require ('./output');
-
     output(ingredients,ingredientQuantities,nutrientTargets);
-
-
-    // That's it!
 }
 
-var fetcher = require('./fetcher').multiple;
 fetcher(recipeUrls,nutrientProfile,calories,macros,run);
 

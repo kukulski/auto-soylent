@@ -35,56 +35,25 @@ var mergeRecipes = function(recipes) {
     return rval;
 }
 
-
-module.exports = {
-
-    single: function(recipeUrl,nutrientProfile,calories,macros,callback) {
-console.log("\nFetching the recipe from the DIY Soylent website...");
+module.exports =function(urls,profileCode,calories,macros,callback) {
+    var state = {recipies:[], profile:null};
 
 
-    request.get(recipeUrl + "/json?nutrientProfile=" + nutrientProfile, function(err, response) {
-    if (err) {
-        console.log("An error occurred", err);
-        return;
+    var allDone = function() {
+        patchProfile(calories,macros,state.profile)
+        var ingredients = mergeRecipes(state.recipies)
+        callback(ingredients, state.profile)
     }
 
-    console.log("Successfully fetched recipe.\n");
-
-    var ingredients     = response.body.ingredients;
-    var nutrientTargets = response.body.nutrientTargets
-
-    patchProfile(calories,macros,nutrientTargets)
-
-
-    callback(ingredients,nutrientTargets);
-});
-},
-    multiple: function(urls,profileCode,calories,macros,callback) {
-        var state = {recipies:[], profile:null};
-
-
-        var allDone = function() {
-            patchProfile(calories,macros,state.profile)
-            var ingredients = mergeRecipes(state.recipies)
-            callback(ingredients, state.profile)
-        }
-
-        var requestDone = function(err,response) {
-            state.profile = response.body.nutrientTargets;
-            state.recipies.push(response.body.ingredients);
-            if(state.recipies.length == urls.length) allDone();
-        }
-
-        var singleRequest = function(url) {
-            request.get(url + "/json?nutrientProfile=" + profileCode,requestDone);
-        }
-        urls.forEach(singleRequest);
-
-
-
-
-
+    var requestDone = function(err,response) {
+        state.profile = response.body.nutrientTargets;
+        state.recipies.push(response.body.ingredients);
+        if(state.recipies.length == urls.length) allDone();
     }
+
+    var singleRequest = function(url) {
+        request.get(url + "/json?nutrientProfile=" + profileCode,requestDone);
+    }
+    urls.forEach(singleRequest);
 }
-
 
