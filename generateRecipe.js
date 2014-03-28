@@ -13,7 +13,7 @@ var ingredientLength,
     M,            // Matrix mapping ingredient amounts to chemical amounts (values are fraction per serving of target value)
     cost,         // Cost of each ingredient per serving
     w = .0001,    // Weight cost regularization (creates sparse recipes for large numbers of ingredient, use 0 for few ingredients)
-    maxPerMin,    // Ratio of maximum value to taget value for each ingredient
+    maxPerMin,    // Ratio of maximum value to target value for each ingredient
     lowWeight,
     highWeight;   // How to weight penalties for going over or under a requirement
 
@@ -131,7 +131,7 @@ function generateRecipe(ingredients, nutrientTargets) {
     // There are some hardcoded rules that should be made configurable in the future.
     for (var t = 0; t < targetAmount.length; t++) {
         // If has a max for this element
-        if (typeof nutrientTargets[targetName[t] + "_max"] > targetAmount[t]) {
+        if (nutrientTargets[targetName[t] + "_max"] > targetAmount[t]) {
             var maxvalue = nutrientTargets[targetName[t] + "_max"];
             maxPerMin[t] = maxvalue / targetAmount[t]; // Record it
         }
@@ -152,9 +152,9 @@ function generateRecipe(ingredients, nutrientTargets) {
 
         // Weird glitch where niacin isn't being read as having a max, so I hardcoded in this
         // should be removed when that is tracked down
-        if (targetName[t] =="niacin"){
-            maxPerMin[t] = 30.0 / 16.0;
-        }
+//     //   if (targetName[t] =="niacin"){
+//     //       maxPerMin[t] = 30.0 / 16.0;
+//      //  }
         // console.log(targetName[t] + " : " + targetAmount[t] +" --max ratio :" + maxPerMin[t] +" weights :" + lowWeight[t]+"," + highWeight[t]);
     }
 
