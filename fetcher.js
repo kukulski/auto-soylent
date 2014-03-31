@@ -35,12 +35,13 @@ var mergeRecipes = function(recipes) {
     return rval;
 }
 
-module.exports =function(urls,profileCode,calories,macros,callback) {
+module.exports =function(args,callback) {
     var state = {recipies:[], profile:null};
 
 
+
     var allDone = function() {
-        patchProfile(calories,macros,state.profile)
+        patchProfile(args.calories,args.macros,state.profile)
         var ingredients = mergeRecipes(state.recipies)
         callback(ingredients, state.profile)
     }
@@ -48,12 +49,12 @@ module.exports =function(urls,profileCode,calories,macros,callback) {
     var requestDone = function(err,response) {
         state.profile = response.body.nutrientTargets;
         state.recipies.push(response.body.ingredients);
-        if(state.recipies.length == urls.length) allDone();
+        if(state.recipies.length == args.urls.length) allDone();
     }
 
     var singleRequest = function(url) {
-        request.get(url + "/json?nutrientProfile=" + profileCode,requestDone);
+        request.get(url + "/json?nutrientProfile=" + args.profile,requestDone);
     }
-    urls.forEach(singleRequest);
+    args.urls.forEach(singleRequest);
 }
 
